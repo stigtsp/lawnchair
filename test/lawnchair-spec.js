@@ -363,7 +363,8 @@ test('batch large utf-8 dataset', function() {
 
   var largeBatchSet = [];
   for(var i = 0; i < setSize; i++) {
-	 var utf8text="Tyttebærsyltetøy 炒飯 寿司 김치 bœuf bourguignon ปอเปี๊ยะ μουσακάς водка ";
+	 var utf8text="Tyttebærsyltetøy 炒飯 寿司 김치 bœuf bourguignon ปอเปี๊ยะ μουσακάς водка Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla placerat leo eget libero pellentesque consequat. Praesent sit amet arcu diam. Nam venenatis sapien et diam porta eget auctor odio malesuada. Nunc fringilla lorem sed velit aliquet a pulvinar libero luctus. Aliquam elit enim, venenatis hendrerit sollicitudin et, elementum vitae purus. Proin consequat luctus lacus quis fermentum. Vivamus sodales arcu nunc, eget posuere tortor. Donec vel fermentum tortor. 寿司";
+
 	 largeBatchSet[i]={ key: "batchKey-" + i, value: utf8text + i };
   }
 

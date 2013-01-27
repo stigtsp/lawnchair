@@ -18,6 +18,46 @@ Lawnchair.adapter('webkit-sqlite', (function () {
         }
     }
 
+
+  var ft_strPack = function(s) {
+    var i, l, out = '';
+    if (s.length % 2 !== 0) {
+		s += ' ';
+    }
+    for (i = 0, l = s.length; i < l; i += 2) {
+		out += String.fromCharCode((s.charCodeAt(i) * 256) + s.charCodeAt(i + 1));
+    }
+	 return out;
+  };
+
+  var ft_strUnpack = function(s){
+	 var i, l, n, m, out = '';
+	 for (i = 0, l = s.length; i < l; i++) {
+		n = s.charCodeAt(i);
+		m = Math.floor(n / 256);
+		out += String.fromCharCode(m, n % 256);
+	 }
+	 return out;
+  };
+
+  
+  var serialize = function(o) {
+    var str = JSON.stringify(o)
+    var encoded_str = "[FT]" + ft_strPack(encodeURIComponent(str))
+    console.log("orig length: " + str.length + " compressed length: " + encoded_str.length)
+    return str.length > encoded_str.length ? encoded_str : str;
+  }
+
+  var deserialize = function(str) {
+    var key = "[FT]"
+    if (str.indexOf(key) == 0) {
+      return JSON.parse(decodeURIComponent(ft_strUnpack(str.substr(key.length)))) 
+    } else {
+      return JSON.parse(str)
+    }
+  }
+
+
     // public methods
     return {
     
@@ -33,6 +73,7 @@ Lawnchair.adapter('webkit-sqlite', (function () {
             this.db.transaction(function (t) { 
                 t.executeSql(create, [], win, fail) 
             })
+
         }, 
 
         keys:  function (callback) {
@@ -68,7 +109,7 @@ Lawnchair.adapter('webkit-sqlite', (function () {
 
           try {
             for (var i = 0, l = objs.length; i < l; i++) {
-              insvals[i] = [JSON.stringify(objs[i]), ts, objs[i].key];
+              insvals[i] = [serialize(objs[i]), ts, objs[i].key];
             }
           } catch (e) {
             fail(e)
@@ -104,7 +145,7 @@ Lawnchair.adapter('webkit-sqlite', (function () {
                 ,   lookup = {}
                 // map from results to keys
 				for (var i = 0, l = results.rows.length; i < l; i++) {
-					o = JSON.parse(results.rows.item(i).value)
+					o = deserialize(results.rows.item(i).value)
 					o.key = results.rows.item(i).id
                     lookup[o.key] = o;
 				}
@@ -132,7 +173,7 @@ Lawnchair.adapter('webkit-sqlite', (function () {
 			,   win  = function (xxx, results) {
 				if (results.rows.length != 0) {
 					for (var i = 0, l = results.rows.length; i < l; i++) {
-						var obj = JSON.parse(results.rows.item(i).value)
+						var obj = deserialize(results.rows.item(i).value)
 						obj.key = results.rows.item(i).id
 						r.push(obj)
 					}
